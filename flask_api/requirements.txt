@@ -2,5 +2,4 @@ flask
 streamlit
 requests
 joblib
-pickle
 scikit-learn
