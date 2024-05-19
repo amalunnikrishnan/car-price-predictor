@@ -1,30 +1,34 @@
 from flask import Flask, request, jsonify
 import joblib
+import pandas as pd
+import numpy as np
 
 
 app = Flask(__name__)
 
-<<<<<<< HEAD
 def load_object(filename):
     with open(filename ,'rb') as f:
         loaded = joblib.load(f)
     return loaded
-=======
-# load model
-model, _ = joblib.load('model.pkl')
->>>>>>> 21d4ad710cd509a0a54934521173382c0a7adf42
+
+cols_to_scale = ["mileage_kmpl", "engine", "max_power", "km_driven_log", "age"]
+
+def get_price(features):
+    print(features)
+    model, _ = load_object('model.pkl')
+    scalers = load_object('scalers.pkl')
+    # for col in cols_to_scale:
+    #     # scale the features and rehape (1, -1)
+    #     features[col] = scalers[col].transform(np.array(features[col]).reshape(1, -1))
+    df = pd.DataFrame([features])
+    prediction = np.exp(model.predict(df))
+    return int(prediction[0])
 
 # prediction function route
 @app.route('/predict', methods=['POST'])
 def predict():
-    
-    # load the model
-    model, _ = load_object('model.joblib')
-    
-    # get the data from the POST request
-    data = request.get_json()
-    prediction = model.predict([data['features']])
-    return jsonify({'prediction': int(prediction[0])})
+    features = request.get_json()
+    return jsonify({'prediction': get_price(features)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
